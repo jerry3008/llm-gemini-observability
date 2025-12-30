@@ -152,7 +152,7 @@ def chat(
     xff = request.headers.get("x-forwarded-for", "")
     client_ip = (xff.split(",")[0].strip() if xff else (request.client.host if request.client else "unknown"))
 
-    # ✅ Total events for SLO (COUNT)
+    #  Total events for SLO (COUNT)
     emit_metric(METRIC_REQUESTS_COUNT, 1, tags=["endpoint:chat"], metric_type="count")
 
     try:
@@ -193,10 +193,10 @@ def chat(
         with _lock:
             TOTAL_LATENCY_MS += latency_ms
 
-        # ✅ Latency for dashboards/latency monitors (GAUGE)
+        #  Latency for dashboards/latency monitors (GAUGE)
         emit_metric(METRIC_LATENCY_MS, latency_ms, tags=["endpoint:chat", "status:ok"], metric_type="gauge")
 
-        # ✅ Good events for SLO (COUNT)
+        #  Good events for SLO (COUNT)
         emit_metric(METRIC_SUCCESS_COUNT, 1, tags=["endpoint:chat"], metric_type="count")
 
         emit_log(
@@ -228,7 +228,7 @@ def chat(
             "answer": answer_text,
         }
 
-    # ✅ HTTPException path: 400/401/429 etc.
+    #  HTTPException path: 400/401/429 etc.
     except HTTPException as he:
         latency_ms = int((time.time() - start) * 1000)
 
@@ -244,7 +244,7 @@ def chat(
             metric_type="gauge",
         )
 
-        # ✅ Bad events for SLO (COUNT)
+        #  Bad events for SLO (COUNT)
         emit_metric(
             METRIC_ERROR_COUNT,
             1,
@@ -278,7 +278,7 @@ def chat(
 
         raise
 
-    # ✅ true 500 path
+    #  true 500 path
     except Exception as e:
         latency_ms = int((time.time() - start) * 1000)
 
@@ -294,7 +294,7 @@ def chat(
             metric_type="gauge",
         )
 
-        # ✅ Bad events for SLO (COUNT)
+        # Bad events for SLO (COUNT)
         emit_metric(
             METRIC_ERROR_COUNT,
             1,
