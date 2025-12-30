@@ -1,0 +1,206 @@
+{
+    "title": "Dashboard: LLM Gemini – Production Observability",
+    "description": "[[suggested_dashboards]]",
+    "layout_type": "ordered",
+    "reflow_type": "auto",
+    "pause_auto_refresh": false,
+    "template_variables": [],
+    "notify_list": [],
+    "widgets": [
+      {
+        "id": 4219177742011899,
+        "definition": {
+          "type": "timeseries",
+          "title": "Requests (rate) - /chat",
+          "title_size": "16",
+          "title_align": "left",
+          "show_legend": true,
+          "legend_layout": "auto",
+          "legend_columns": ["avg", "min", "max", "value", "sum"],
+          "requests": [
+            {
+              "response_format": "timeseries",
+              "queries": [
+                {
+                  "name": "query1",
+                  "data_source": "metrics",
+                  "query": "sum:dd_gemini.slo_requests_count{service:dd-gemini-app}.as_rate()"
+                }
+              ],
+              "formulas": [
+                {
+                  "alias": "Requests per minute",
+                  "formula": "query1"
+                }
+              ],
+              "style": {
+                "palette": "dog_classic",
+                "line_type": "solid",
+                "line_width": "normal"
+              },
+              "display_type": "line"
+            }
+          ]
+        }
+      },
+      {
+        "id": 2812607349652429,
+        "definition": {
+          "type": "timeseries",
+          "title": "Chat Success vs Errors (count)",
+          "title_size": "16",
+          "title_align": "left",
+          "show_legend": true,
+          "legend_layout": "auto",
+          "legend_columns": ["avg", "min", "max", "value", "sum"],
+          "requests": [
+            {
+              "response_format": "timeseries",
+              "queries": [
+                {
+                  "name": "success",
+                  "data_source": "metrics",
+                  "query": "sum:dd_gemini.slo_chat_success_count{service:dd-gemini-app,endpoint:chat}.as_count()"
+                },
+                {
+                  "name": "errors",
+                  "data_source": "metrics",
+                  "query": "sum:dd_gemini.slo_chat_error_count{service:dd-gemini-app,endpoint:chat}.as_count()"
+                }
+              ],
+              "formulas": [
+                { "alias": "Success", "formula": "success" },
+                { "alias": "Errors", "formula": "errors" }
+              ],
+              "style": {
+                "palette": "dog_classic",
+                "line_type": "solid",
+                "line_width": "normal"
+              },
+              "display_type": "line"
+            }
+          ]
+        }
+      },
+      {
+        "id": 2105748707169968,
+        "definition": {
+          "type": "timeseries",
+          "title": "Chat Latency (Average, ms)",
+          "title_size": "16",
+          "title_align": "left",
+          "show_legend": true,
+          "legend_layout": "auto",
+          "legend_columns": ["avg", "min", "max", "value", "sum"],
+          "requests": [
+            {
+              "response_format": "timeseries",
+              "queries": [
+                {
+                  "name": "latency",
+                  "data_source": "metrics",
+                  "query": "avg:dd_gemini.latency_ms{service:dd-gemini-app}"
+                }
+              ],
+              "formulas": [
+                {
+                  "alias": "Latency (ms)",
+                  "formula": "latency"
+                }
+              ],
+              "style": {
+                "palette": "dog_classic",
+                "line_type": "solid",
+                "line_width": "normal"
+              },
+              "display_type": "line"
+            }
+          ]
+        }
+      },
+      {
+        "id": 7314257948085340,
+        "definition": {
+          "type": "distribution",
+          "title": "Chat Latency Distribution",
+          "title_size": "16",
+          "title_align": "left",
+          "requests": [
+            {
+              "response_format": "scalar",
+              "queries": [
+                {
+                  "name": "latency_dist",
+                  "data_source": "metrics",
+                  "query": "avg:dd_gemini.latency_ms{service:dd-gemini-app,endpoint:chat}",
+                  "aggregator": "avg"
+                }
+              ],
+              "formulas": [{ "formula": "latency_dist" }]
+            }
+          ]
+        }
+      },
+      {
+        "id": 5765893725785476,
+        "definition": {
+          "type": "timeseries",
+          "title": "Chat Success Rate (%) / Error Rate (%)",
+          "title_size": "16",
+          "title_align": "left",
+          "show_legend": true,
+          "requests": [
+            {
+              "response_format": "timeseries",
+              "queries": [
+                {
+                  "name": "success",
+                  "data_source": "metrics",
+                  "query": "sum:dd_gemini.slo_chat_success_count{service:dd-gemini-app,endpoint:chat}.as_count()"
+                },
+                {
+                  "name": "errors",
+                  "data_source": "metrics",
+                  "query": "sum:dd_gemini.slo_chat_error_count{service:dd-gemini-app,endpoint:chat}.as_count()"
+                }
+              ],
+              "formulas": [
+                {
+                  "alias": "Success Rate (%)",
+                  "formula": "100 * success / (success + errors)"
+                },
+                {
+                  "alias": "Error Rate (%)",
+                  "formula": "100 * errors / (success + errors)"
+                }
+              ],
+              "display_type": "line"
+            }
+          ],
+          "yaxis": {
+            "include_zero": true,
+            "min": "0",
+            "max": "100"
+          }
+        }
+      },
+      {
+        "id": 8150660843097780,
+        "definition": {
+          "type": "slo_summary",
+          "title": "LLM Reliability — SLO Health Overview",
+          "title_size": "16",
+          "title_align": "left",
+          "requests": [
+            {
+              "request_type": "slo_summary",
+              "query": {
+                "query_string": "LLM"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+  
